@@ -1,0 +1,15 @@
+{"level":"info","message":"Server is running on port 3000","timestamp":"2024-12-04T04:23:36.581Z"}
+{"level":"info","message":"- - - [04/Dec/2024:04:23:39 +0000] \"GET / HTTP/1.1\" 404 139 \"https://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36\"","timestamp":"2024-12-04T04:23:39.901Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2024-12-04T04:26:07.065Z"}
+{"level":"info","message":"- - - [04/Dec/2024:04:26:07 +0000] \"GET / HTTP/1.1\" 404 139 \"https://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36\"","timestamp":"2024-12-04T04:26:07.862Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2024-12-04T04:26:15.909Z"}
+{"level":"info","message":"- - - [04/Dec/2024:04:26:16 +0000] \"GET / HTTP/1.1\" 404 139 \"https://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36\"","timestamp":"2024-12-04T04:26:16.013Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2024-12-04T04:26:24.106Z"}
+{"level":"info","message":"- - - [04/Dec/2024:04:26:24 +0000] \"GET / HTTP/1.1\" 404 139 \"https://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36\"","timestamp":"2024-12-04T04:26:24.189Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2024-12-04T04:26:40.896Z"}
+{"level":"info","message":"- - - [04/Dec/2024:04:26:41 +0000] \"GET / HTTP/1.1\" 404 139 \"https://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36\"","timestamp":"2024-12-04T04:26:41.006Z"}
+{"level":"info","message":"Server running in development mode on port 3000","timestamp":"2024-12-05T05:10:55.914Z"}
+{"level":"info","message":"MongoDB connected successfully","timestamp":"2024-12-05T05:10:56.034Z"}
+{"level":"info","message":"Redis Client Connected Successfully","timestamp":"2024-12-05T05:10:56.345Z"}
+{"level":"info","message":"Redis Client Ready to Accept Commands","timestamp":"2024-12-05T05:10:56.593Z"}
+{"level":"info","message":"Redis connection test successful","timestamp":"2024-12-05T05:10:56.826Z"}
