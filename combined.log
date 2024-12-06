@@ -82,3 +82,4 @@
 {"level":"info","message":"Redis Client Ready to Accept Commands","timestamp":"2024-12-06T12:20:39.381Z"}
 {"level":"info","message":"MongoDB connected successfully","timestamp":"2024-12-06T12:20:39.557Z"}
 {"level":"info","message":"Redis connection test successful","timestamp":"2024-12-06T12:20:39.801Z"}
+{"level":"warn","message":"MongoDB disconnected. Attempting to reconnect...","timestamp":"2024-12-06T12:50:54.389Z"}

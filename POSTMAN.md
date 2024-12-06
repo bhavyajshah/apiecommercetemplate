@@ -1,18 +1,17 @@
 # Template Marketplace API Documentation
 
 ## Table of Contents
-1. [Setup](#setup)
+1. [Environment Setup](#environment-setup)
 2. [Authentication](#authentication)
 3. [Templates](#templates)
 4. [Reviews](#reviews)
 5. [Cart](#cart)
 6. [Orders](#orders)
 7. [Error Handling](#error-handling)
-8. [Rate Limiting](#rate-limiting)
 
-## Setup
+## Environment Setup
 
-### Environment Variables
+### Variables
 ```json
 {
   "BASE_URL": "http://localhost:3000/api",
@@ -31,7 +30,7 @@
 
 ## Authentication
 
-### Register
+### Register User
 ```http
 POST {{BASE_URL}}/auth/register
 Content-Type: application/json
@@ -68,6 +67,20 @@ Content-Type: application/json
 }
 ```
 
+**Response (200)**
+```json
+{
+    "user": {
+        "_id": "user_id",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "role": "user"
+    },
+    "token": "jwt_token",
+    "expiresIn": "24h"
+}
+```
+
 ### Refresh Token
 ```http
 POST {{BASE_URL}}/auth/refresh-token
@@ -75,6 +88,14 @@ Content-Type: application/json
 
 {
     "token": "current_refresh_token"
+}
+```
+
+**Response (200)**
+```json
+{
+    "token": "new_jwt_token",
+    "expiresIn": "24h"
 }
 ```
 
@@ -97,6 +118,43 @@ Query Parameters:
 - featured (boolean)
 ```
 
+**Example Request**
+```http
+GET {{BASE_URL}}/templates?page=1&limit=10&category=nextjs&minPrice=0&maxPrice=100&sortBy=price&sortOrder=asc
+```
+
+**Response (200)**
+```json
+{
+    "docs": [
+        {
+            "_id": "template_id",
+            "name": "Modern Next.js Template",
+            "category": "nextjs",
+            "price": 29.99,
+            "thumbnailUrl": "https://example.com/thumbnail.jpg",
+            "type": "paid",
+            "averageRating": 4.5,
+            "numberOfReviews": 10,
+            "downloads": 150,
+            "author": {
+                "_id": "author_id",
+                "name": "John Doe"
+            }
+        }
+    ],
+    "totalDocs": 100,
+    "limit": 10,
+    "totalPages": 10,
+    "page": 1,
+    "pagingCounter": 1,
+    "hasPrevPage": false,
+    "hasNextPage": true,
+    "prevPage": null,
+    "nextPage": 2
+}
+```
+
 ### Create Template
 ```http
 POST {{BASE_URL}}/templates
@@ -113,9 +171,25 @@ thumbnail: [File]
 features: ["SSR", "SEO Optimized"]
 tags: ["nextjs", "react"]
 compatibility: {
-  "frameworks": ["Next.js 13+"],
-  "browsers": ["Chrome", "Firefox"],
-  "nodeVersion": ">=14"
+    "frameworks": ["Next.js 13+"],
+    "browsers": ["Chrome", "Firefox"],
+    "nodeVersion": ">=14"
+}
+```
+
+**Response (201)**
+```json
+{
+    "_id": "template_id",
+    "name": "Modern Next.js Template",
+    "category": "nextjs",
+    "price": 29.99,
+    "thumbnailUrl": "https://example.com/thumbnail.jpg",
+    "features": ["SSR", "SEO Optimized"],
+    "tags": ["nextjs", "react"],
+    "type": "paid",
+    "author": "user_id",
+    "createdAt": "2023-12-06T12:00:00.000Z"
 }
 ```
 
@@ -124,21 +198,22 @@ compatibility: {
 PUT {{BASE_URL}}/templates/:id
 Content-Type: multipart/form-data
 
-// Form Data (all fields optional)
+// Form Data
 name: "Updated Template Name"
 price: 39.99
 thumbnail: [File]
 features: ["Feature 1", "Feature 2"]
 ```
 
-### Delete Template
-```http
-DELETE {{BASE_URL}}/templates/:id
-```
-
-### Restore Template (Admin)
-```http
-POST {{BASE_URL}}/templates/:id/restore
+**Response (200)**
+```json
+{
+    "_id": "template_id",
+    "name": "Updated Template Name",
+    "price": 39.99,
+    "features": ["Feature 1", "Feature 2"],
+    "updatedAt": "2023-12-06T12:00:00.000Z"
+}
 ```
 
 ## Reviews
@@ -146,10 +221,26 @@ POST {{BASE_URL}}/templates/:id/restore
 ### Add Review
 ```http
 POST {{BASE_URL}}/reviews/:templateId
+Content-Type: application/json
 
 {
     "rating": 5,
-    "comment": "Excellent template!"
+    "comment": "Excellent template with great features!"
+}
+```
+
+**Response (201)**
+```json
+{
+    "_id": "review_id",
+    "rating": 5,
+    "comment": "Excellent template with great features!",
+    "user": {
+        "_id": "user_id",
+        "name": "John Doe"
+    },
+    "template": "template_id",
+    "createdAt": "2023-12-06T12:00:00.000Z"
 }
 ```
 
@@ -158,19 +249,24 @@ POST {{BASE_URL}}/reviews/:templateId
 GET {{BASE_URL}}/reviews/template/:templateId?page=1&limit=10
 ```
 
-### Update Review
-```http
-PUT {{BASE_URL}}/reviews/:reviewId
-
+**Response (200)**
+```json
 {
-    "rating": 4,
-    "comment": "Updated review"
+    "reviews": [
+        {
+            "_id": "review_id",
+            "rating": 5,
+            "comment": "Excellent template!",
+            "user": {
+                "_id": "user_id",
+                "name": "John Doe"
+            },
+            "createdAt": "2023-12-06T12:00:00.000Z"
+        }
+    ],
+    "totalPages": 5,
+    "currentPage": 1
 }
-```
-
-### Delete Review
-```http
-DELETE {{BASE_URL}}/reviews/:reviewId
 ```
 
 ## Cart
@@ -180,9 +276,30 @@ DELETE {{BASE_URL}}/reviews/:reviewId
 GET {{BASE_URL}}/cart
 ```
 
+**Response (200)**
+```json
+{
+    "_id": "cart_id",
+    "user": "user_id",
+    "items": [
+        {
+            "template": {
+                "_id": "template_id",
+                "name": "Modern Next.js Template",
+                "price": 29.99,
+                "thumbnailUrl": "https://example.com/thumbnail.jpg"
+            },
+            "quantity": 1
+        }
+    ],
+    "totalAmount": 29.99
+}
+```
+
 ### Add to Cart
 ```http
 POST {{BASE_URL}}/cart/add
+Content-Type: application/json
 
 {
     "templateId": "template_id",
@@ -193,20 +310,11 @@ POST {{BASE_URL}}/cart/add
 ### Update Cart Item
 ```http
 PUT {{BASE_URL}}/cart/update/:templateId
+Content-Type: application/json
 
 {
     "quantity": 2
 }
-```
-
-### Remove from Cart
-```http
-DELETE {{BASE_URL}}/cart/remove/:templateId
-```
-
-### Clear Cart
-```http
-DELETE {{BASE_URL}}/cart/clear
 ```
 
 ## Orders
@@ -214,6 +322,7 @@ DELETE {{BASE_URL}}/cart/clear
 ### Create Order
 ```http
 POST {{BASE_URL}}/orders
+Content-Type: application/json
 
 {
     "templates": [
@@ -222,23 +331,34 @@ POST {{BASE_URL}}/orders
 }
 ```
 
+**Response (201)**
+```json
+{
+    "order": {
+        "_id": "order_id",
+        "user": "user_id",
+        "templates": [
+            {
+                "template": "template_id",
+                "price": 29.99
+            }
+        ],
+        "totalAmount": 29.99,
+        "paymentStatus": "pending",
+        "createdAt": "2023-12-06T12:00:00.000Z"
+    },
+    "clientSecret": "stripe_client_secret"
+}
+```
+
 ### Process Payment
 ```http
 POST {{BASE_URL}}/orders/:orderId/pay
+Content-Type: application/json
 
 {
     "paymentMethodId": "pm_card_visa"
 }
-```
-
-### Get Order History
-```http
-GET {{BASE_URL}}/orders?page=1&limit=10
-```
-
-### Get Order Details
-```http
-GET {{BASE_URL}}/orders/:orderId
 ```
 
 ## Error Handling
@@ -256,7 +376,7 @@ All error responses follow this format:
 }
 ```
 
-Common Status Codes:
+### Common Status Codes
 - 200: Success
 - 201: Created
 - 400: Bad Request
@@ -266,28 +386,15 @@ Common Status Codes:
 - 429: Too Many Requests
 - 500: Internal Server Error
 
-## Rate Limiting
-
-### API Endpoints
-- 100 requests per 15 minutes
-- Headers returned:
-  - X-RateLimit-Limit
-  - X-RateLimit-Remaining
-  - X-RateLimit-Reset
-
-### Authentication Endpoints
-- 5 attempts per hour
-- Headers returned:
-  - X-RateLimit-Limit
-  - X-RateLimit-Remaining
-  - X-RateLimit-Reset
-
 ## Testing Examples
 
 ### Complete Purchase Flow
-1. Register/Login
+
+1. Login
 ```http
 POST {{BASE_URL}}/auth/login
+Content-Type: application/json
+
 {
     "email": "john@example.com",
     "password": "SecurePass123!"
@@ -302,6 +409,8 @@ GET {{BASE_URL}}/templates?category=nextjs&status=paid
 3. Add to Cart
 ```http
 POST {{BASE_URL}}/cart/add
+Content-Type: application/json
+
 {
     "templateId": "template_id",
     "quantity": 1
@@ -311,6 +420,8 @@ POST {{BASE_URL}}/cart/add
 4. Create Order
 ```http
 POST {{BASE_URL}}/orders
+Content-Type: application/json
+
 {
     "templates": [
         { "templateId": "template_id" }
@@ -321,47 +432,49 @@ POST {{BASE_URL}}/orders
 5. Process Payment
 ```http
 POST {{BASE_URL}}/orders/:orderId/pay
+Content-Type: application/json
+
 {
     "paymentMethodId": "pm_card_visa"
 }
 ```
 
 ### Template Management Flow
+
 1. Create Template
 ```http
 POST {{BASE_URL}}/templates
-// Form data with template details and image
+Content-Type: multipart/form-data
+
+// Form data
+name: "Next.js E-commerce Template"
+category: "nextjs"
+description: "Complete e-commerce solution built with Next.js"
+price: 49.99
+type: "paid"
+features: ["SSR", "Cart Management", "Admin Dashboard"]
+tags: ["nextjs", "ecommerce", "typescript"]
+thumbnail: [File]
 ```
 
 2. Update Template
 ```http
 PUT {{BASE_URL}}/templates/:id
-// Updated template information
+Content-Type: multipart/form-data
+
+// Form data
+name: "Updated Template Name"
+price: 59.99
+features: ["New Feature 1", "New Feature 2"]
 ```
 
 3. Add Review
 ```http
 POST {{BASE_URL}}/reviews/:templateId
+Content-Type: application/json
+
 {
     "rating": 5,
-    "comment": "Great template!"
-}
-```
-
-## Environment-Specific Settings
-
-### Development
-```json
-{
-    "BASE_URL": "http://localhost:3000/api",
-    "STRIPE_PUBLISHABLE_KEY": "pk_test_..."
-}
-```
-
-### Production
-```json
-{
-    "BASE_URL": "https://api.yourservice.com/api",
-    "STRIPE_PUBLISHABLE_KEY": "pk_live_..."
+    "comment": "Outstanding template with excellent documentation!"
 }
 ```
