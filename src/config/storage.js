@@ -1,21 +1,21 @@
-const AWS = require('aws-sdk');
-const multer = require('multer');
-const multerS3 = require('multer-s3');
+  const multer = require('multer');
+const multerS3 = require('multer-s3-v3');
 const path = require('path');
+const { S3Client } = require('@aws-sdk/client-s3');
 
-// Configure AWS
-AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION
+// Initialize S3 client
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  }
 });
-
-const s3 = new AWS.S3();
 
 // Configure multer for S3 upload
 const upload = multer({
   storage: multerS3({
-    s3: s3,
+    s3: s3Client,
     bucket: process.env.AWS_BUCKET_NAME,
     acl: 'public-read',
     metadata: (req, file, cb) => {
@@ -24,7 +24,8 @@ const upload = multer({
     key: (req, file, cb) => {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
       cb(null, `templates/${uniqueSuffix}${path.extname(file.originalname)}`);
-    }
+    },
+    contentType: multerS3.AUTO_CONTENT_TYPE
   }),
   fileFilter: (req, file, cb) => {
     const allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
