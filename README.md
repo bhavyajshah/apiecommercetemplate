@@ -209,3 +209,417 @@ npm test
 ## License
 
 MIT License
+
+
+
+# Template Marketplace API Documentation
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB
+- Redis
+- Stripe Account
+- SendGrid Account
+
+### Installation Steps
+
+1. Clone the repository
+2. Install dependencies:
+```bash
+npm install
+```
+3. Set up environment variables in `.env`
+4. Start the server:
+```bash
+npm run dev
+```
+
+## API Endpoints Documentation
+
+### Authentication APIs
+
+#### 1. Register User
+- **Endpoint**: `POST /api/auth/register`
+- **Headers**: `Content-Type: application/json`
+- **Body**:
+```json
+{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "StrongPass123!"
+}
+```
+- **Response**:
+```json
+{
+    "user": {
+        "_id": "user_id",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "role": "user"
+    },
+    "token": "jwt_token",
+    "expiresIn": "24h"
+}
+```
+
+#### 2. Login
+- **Endpoint**: `POST /api/auth/login`
+- **Headers**: `Content-Type: application/json`
+- **Body**:
+```json
+{
+    "email": "john@example.com",
+    "password": "StrongPass123!"
+}
+```
+- **Response**:
+```json
+{
+    "user": {
+        "_id": "user_id",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "role": "user"
+    },
+    "token": "jwt_token",
+    "expiresIn": "24h"
+}
+```
+
+### Template APIs
+
+#### 1. Get All Templates
+- **Endpoint**: `GET /api/templates`
+- **Headers**: `Authorization: Bearer your_token`
+- **Query Parameters**:
+  - page (default: 1)
+  - limit (default: 10)
+  - category (optional)
+  - minPrice (optional)
+  - maxPrice (optional)
+  - search (optional)
+- **Response**:
+```json
+{
+    "templates": [{
+        "_id": "template_id",
+        "name": "Template Name",
+        "category": "nextjs",
+        "description": "Template description",
+        "price": 29.99,
+        "type": "paid",
+        "averageRating": 4.5
+    }],
+    "totalPages": 5,
+    "currentPage": 1
+}
+```
+
+#### 2. Get Template Details
+- **Endpoint**: `GET /api/templates/:id`
+- **Headers**: `Authorization: Bearer your_token`
+- **Response**:
+```json
+{
+    "_id": "template_id",
+    "name": "Template Name",
+    "category": "nextjs",
+    "description": "Detailed description",
+    "price": 29.99,
+    "type": "paid",
+    "features": ["Feature 1", "Feature 2"],
+    "tags": ["tag1", "tag2"],
+    "author": {
+        "_id": "author_id",
+        "name": "Author Name"
+    },
+    "averageRating": 4.5,
+    "numberOfReviews": 10,
+    "reviews": [{
+        "_id": "review_id",
+        "rating": 5,
+        "comment": "Great template!",
+        "user": {
+            "_id": "user_id",
+            "name": "Reviewer Name"
+        }
+    }]
+}
+```
+
+#### 3. Download Template
+- **Endpoint**: `GET /api/templates/:id/download`
+- **Headers**: `Authorization: Bearer your_token`
+- **Response**:
+```json
+{
+    "downloadUrl": "template_download_url"
+}
+```
+
+### Cart APIs
+
+#### 1. Get Cart
+- **Endpoint**: `GET /api/cart`
+- **Headers**: `Authorization: Bearer your_token`
+- **Response**:
+```json
+{
+    "_id": "cart_id",
+    "items": [{
+        "template": {
+            "_id": "template_id",
+            "name": "Template Name",
+            "price": 29.99
+        },
+        "quantity": 1
+    }],
+    "totalAmount": 29.99
+}
+```
+
+#### 2. Add to Cart
+- **Endpoint**: `POST /api/cart/add`
+- **Headers**:
+  - `Authorization: Bearer your_token`
+  - `Content-Type: application/json`
+- **Body**:
+```json
+{
+    "templateId": "template_id",
+    "quantity": 1
+}
+```
+- **Response**: Updated cart object
+
+#### 3. Update Cart Item
+- **Endpoint**: `PUT /api/cart/update/:templateId`
+- **Headers**:
+  - `Authorization: Bearer your_token`
+  - `Content-Type: application/json`
+- **Body**:
+```json
+{
+    "quantity": 2
+}
+```
+- **Response**: Updated cart object
+
+#### 4. Remove from Cart
+- **Endpoint**: `DELETE /api/cart/remove/:templateId`
+- **Headers**: `Authorization: Bearer your_token`
+- **Response**: Updated cart object
+
+### Order APIs
+
+#### 1. Create Order
+- **Endpoint**: `POST /api/orders`
+- **Headers**:
+  - `Authorization: Bearer your_token`
+  - `Content-Type: application/json`
+- **Body**:
+```json
+{
+    "templates": [{
+        "templateId": "template_id"
+    }]
+}
+```
+- **Response**:
+```json
+{
+    "order": {
+        "_id": "order_id",
+        "templates": [{
+            "template": "template_id",
+            "price": 29.99
+        }],
+        "totalAmount": 29.99,
+        "paymentStatus": "pending"
+    },
+    "clientSecret": "stripe_client_secret"
+}
+```
+
+### Review APIs
+
+#### 1. Create Review
+- **Endpoint**: `POST /api/reviews/:templateId`
+- **Headers**:
+  - `Authorization: Bearer your_token`
+  - `Content-Type: application/json`
+- **Body**:
+```json
+{
+    "rating": 5,
+    "comment": "Excellent template with great features!"
+}
+```
+- **Response**:
+```json
+{
+    "_id": "review_id",
+    "rating": 5,
+    "comment": "Excellent template with great features!",
+    "user": {
+        "_id": "user_id",
+        "name": "Reviewer Name"
+    },
+    "template": "template_id",
+    "createdAt": "2024-03-07T10:00:00.000Z"
+}
+```
+
+#### 2. Get Template Reviews
+- **Endpoint**: `GET /api/reviews/template/:templateId`
+- **Query Parameters**:
+  - page (default: 1)
+  - limit (default: 10)
+- **Response**:
+```json
+{
+    "reviews": [{
+        "_id": "review_id",
+        "rating": 5,
+        "comment": "Great template!",
+        "user": {
+            "_id": "user_id",
+            "name": "Reviewer Name"
+        },
+        "createdAt": "2024-03-07T10:00:00.000Z"
+    }],
+    "totalPages": 2,
+    "currentPage": 1
+}
+```
+
+## Testing with Postman
+
+1. **Environment Setup**:
+   - Create a new environment in Postman
+   - Add variables:
+     - `baseUrl`: `http://localhost:3000`
+     - `token`: Empty (will be filled after login)
+
+2. **Collection Setup**:
+   - Create a new collection
+   - Add a pre-request script to automatically add the token:
+   ```javascript
+   if (pm.environment.get('token')) {
+       pm.request.headers.add({
+           key: 'Authorization',
+           value: 'Bearer ' + pm.environment.get('token')
+       });
+   }
+   ```
+
+3. **Testing Flow**:
+   1. Register a new user
+   2. Login and save the token
+   3. Browse templates
+   4. Add templates to cart
+   5. Create an order
+   6. Add reviews
+
+### Example Test Sequence
+
+1. **Register**:
+   ```bash
+   curl -X POST http://localhost:3000/api/auth/register \
+   -H "Content-Type: application/json" \
+   -d '{
+       "name": "Test User",
+       "email": "test@example.com",
+       "password": "TestPass123!"
+   }'
+   ```
+
+2. **Login**:
+   ```bash
+   curl -X POST http://localhost:3000/api/auth/login \
+   -H "Content-Type: application/json" \
+   -d '{
+       "email": "test@example.com",
+       "password": "TestPass123!"
+   }'
+   ```
+
+3. **Browse Templates**:
+   ```bash
+   curl -X GET "http://localhost:3000/api/templates?page=1&limit=10&category=nextjs" \
+   -H "Authorization: Bearer YOUR_TOKEN"
+   ```
+
+4. **Add to Cart**:
+   ```bash
+   curl -X POST http://localhost:3000/api/cart/add \
+   -H "Authorization: Bearer YOUR_TOKEN" \
+   -H "Content-Type: application/json" \
+   -d '{
+       "templateId": "template_id",
+       "quantity": 1
+   }'
+   ```
+
+## Error Handling
+
+The API uses consistent error response format:
+```json
+{
+    "error": "Error message",
+    "details": [] // Optional array of detailed error information
+}
+```
+
+Common HTTP Status Codes:
+- 200: Success
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 429: Too Many Requests
+- 500: Internal Server Error
+
+## Rate Limiting
+
+- API endpoints: 100 requests per 15 minutes
+- Authentication endpoints: 5 attempts per hour
+
+## Security Features
+
+- JWT token authentication
+- Password hashing with bcrypt
+- Input validation and sanitization
+- Rate limiting
+- CORS protection
+- Security headers with Helmet
+- Request logging
+
+## Development Notes
+
+1. For local development, ensure MongoDB and Redis are running
+2. Use environment variables for configuration
+3. Monitor logs for debugging
+4. Use Postman collections for API testing
+5. Follow security best practices
+
+## Troubleshooting
+
+1. **Connection Issues**:
+   - Check MongoDB connection
+   - Verify Redis connection
+   - Ensure correct environment variables
+
+2. **Authentication Issues**:
+   - Verify token format
+   - Check token expiration
+   - Confirm user credentials
+
+3. **Payment Issues**:
+   - Verify Stripe configuration
+   - Check webhook setup
+   - Monitor payment logs
